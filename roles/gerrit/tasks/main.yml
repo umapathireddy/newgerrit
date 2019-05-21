@@ -1,0 +1,66 @@
+---
+
+  
+
+
+    - name: Install add-apt-repostory
+
+      apt: name=openjdk-8-jdk state=present
+
+    - name: Check java environment varibale file is there ot not
+
+      stat:
+
+        path: /etc/profile.d/java.sh
+
+      register: env_result
+
+
+
+    - name: Create Java environment variavke file
+
+      file:
+
+        path: /etc/profile.d/java.sh
+
+        state: touch
+
+      when: env_result.stat.exists == False
+
+    - name: Set JAVA_HOME To the PATH
+
+      lineinfile:
+
+        dest: /etc/profile.d/java.sh
+
+        line: '{{ item }}'
+
+      with_items:
+
+        - 'export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64'
+
+        - 'export PATH=${JAVA_HOME}/bin:${PATH}'
+
+    - name: Source java
+
+      shell: source /etc/profile.d/java.sh && echo $JAVA_HOME
+
+      args:
+
+        executable: /bin/bash
+
+    - name: get gerrit jar file
+
+      get_url:
+
+        url: https://gerrit-releases.storage.googleapis.com/gerrit-3.0.0.war
+
+        dest: /root/gerrit-3.0.0.war
+ 
+    - name: executing jar file
+
+      shell: java -jar /root/gerrit-3.0.0.war init --batch --dev -d /gerrit_workspsce
+
+    - name: Create Gerrit.conf
+  
+      template: src=gerrit.config dest=/gerrit_workspsce/etc/gerrit.config
