@@ -1,0 +1,10 @@
+---
+- hosts: localhost
+  become: yes
+  tasks:
+    - name: Add deployer user and add it to sudo
+      user: name=gerritadmin
+            state=present
+            createhome=yes
+      become: yes
+      become_method: "sudo"

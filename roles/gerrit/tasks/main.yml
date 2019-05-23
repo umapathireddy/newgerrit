@@ -48,6 +48,14 @@
       args:
 
         executable: /bin/bash
+      
+    - name: Add gerritadmin user and add it to sudo
+      user: name=gerritadmin
+            state=present
+            createhome=yes
+      become: yes
+      become_method: "sudo"
+
 
     - name: get gerrit jar file
 
@@ -55,12 +63,12 @@
 
         url: https://gerrit-releases.storage.googleapis.com/gerrit-3.0.0.war
 
-        dest: /root/gerrit-3.0.0.war
+        dest: /home/gerritadmin/gerrit-3.0.0.war
  
     - name: executing jar file
 
-      shell: java -jar /root/gerrit-3.0.0.war init --batch --dev -d /gerrit_workspsce
+      shell: java -jar /home/gerritadmin/gerrit-3.0.0.war init --batch --dev -d /home/gerritadmin/gerrit_workspsce
 
     - name: Create Gerrit.conf
   
-      template: src=gerrit.config dest=/gerrit_workspsce/etc/gerrit.config
+      template: src=gerrit.config dest=/home/gerritadmin/gerrit_workspsce/etc/gerrit.config
